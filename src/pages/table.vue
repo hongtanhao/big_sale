@@ -18,7 +18,8 @@ export default {
                     ishaveCheckbox: true, //true显示多选 false 不显示
                     ishaveHandle: true, // true 显示 可操作按钮 false 不显示
                     isfunctionTablle: true,//true 显示增、删、改、查   false不显示
-                    isshowWaiting: true // 是否开启等待组件
+                    ishaveWaiting: true, // 控制组件是否存在
+                    isshowWaiting: false, // 控制组件是否显示 初始化不显示
                 },
                 paginationconfig: {
                     eachPageShowCount: 10, //每页显示多少条记录  根据页面布局设置
