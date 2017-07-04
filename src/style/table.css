@@ -1,0 +1,196 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+
+/*定义表格基本样式*/
+
+.zdy-table {
+    border-collapse: collapse;
+    padding: 1rem;
+}
+
+
+/* .zdy-table tr:hover{
+    background-color: #ccc;
+    transition: all .1s;
+  }*/
+
+.zdy-table td,.zdy-table th{
+    line-height: 42px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    text-align: center;
+}
+
+
+/**
+   * 定义表格按钮样式
+   */
+
+.table-button {
+    padding: 0;
+    margin: 0;
+}
+
+.table-button li {
+    display: inline-block;
+    line-height: 48px;
+    width: 80px;
+    text-align: center;
+    color: #fff;
+}
+
+
+/* 定义单条数据的操作按钮样式*/
+
+.td-button,
+.sure-serch {
+    display: inline-block;
+    line-height: 30px;
+    width: 50px;
+    text-align: center;
+    color: #fff;
+}
+
+.td-button-delete,
+.sure-serch {
+    background-color: red;
+}
+
+.td-button-examine {
+    background-color: blue;
+}
+
+
+/*定义功能性表格的按钮样式*/
+
+.table-button-and {
+    background-color: green;
+}
+
+.table-button-delete {
+    background-color: red;
+}
+
+.table-button-modify {
+    background-color: yellow;
+}
+
+.table-button-examine {
+    background-color: blue;
+}
+
+
+/*定义分页器样式*/
+
+.pagination {
+    font-size: 0;
+}
+
+.pagination li,
+.link-which-page {
+    display: inline-block;
+    font-size: 1rem;
+    line-height: 2rem;
+    width: 2rem;
+    text-align: center;
+    /*color: #fff;*/
+}
+
+.current-page {
+    background-color: red;
+    color: #fff;
+}
+
+.pagination li:last-child {
+    padding-left: 4rem;
+    width: 15rem;
+}
+
+.prev:after,
+.next:after {
+    display: table;
+    content: '';
+    height: .5rem;
+    width: 1rem;
+    box-sizing: border-box;
+    border-top: transparent solid .25rem;
+    border-bottom: transparent solid .25rem;
+    border-left: transparent solid .5rem;
+    border-right: #000 solid .5rem;
+}
+
+.next:after {
+    border-right: transparent solid .5rem;
+    border-left: #000 solid .5rem;
+}
+
+
+/*定义新增弹框样式*/
+
+.dialogbox {
+    position: absolute;
+    z-index: 100;
+    top: 100px;
+    left: 100px;
+    background-color: rgba(255, 255, 255, .86);
+    padding: 2rem 3rem;
+    text-align: left;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, .7);
+}
+.dialogbox p{
+    text-align: right;
+}
+.dialogbox input {
+    float: right;
+}
+
+.dialog-btn-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-block;
+    line-height: 2rem;
+    width: 2rem;
+    text-align: center;
+    background-color: red;
+    color: #fff;
+}
+
+.dialog-btn-cancel,
+.dialog-btn-submit {
+    display: inline-block;
+    line-height: 1rem;
+    padding: .5rem 1rem;
+    text-align: center;
+    background-color: red;
+    position: relative;
+    /*left: 80px;*/
+    top: 20px;
+    color: #fff;
+}
+
+.dialog-btn-submit {
+    background-color: green;
+}
+
+.waiting{
+   position:absolute;
+   top:25%;
+   transform:translateY(-50%);
+   text-align: center;
+   animation:waiting 1s linear  infinite;   
+   animation-play-state:running;
+   left: 28%;  
+}
+.waiting svg{
+    left: 200px;
+}
+@keyframes waiting /*定义动画名*/  
+    {   
+    0%   {transform:rotate(0)} /*定义起始帧样式，0%可以换成from*/  
+    
+    100% {transform:rotate(360deg)} /*定义结束帧样式，100%可以换成to*/  
+    }   
