@@ -1,53 +1,138 @@
 import Vue from 'vue';
+// import $ from 'jquery';
 export default function () {
     var mine;
     var opts = {
-        props: ['tablematedata'],
+        props: ['tablematedata','urladdress','deleteItems'],
         template: `<div>
             <waiting :waiting="tablemateData" v-if="ishaveWaiting"></waiting>  
-            <my-table-button :tablebutton="tablemateData" 
+             <my-table-button :tablebutton="tablemateData" 
                 @addDATA="onAddData"
                 @deleteDATA="onDeleteData"
                 @updateDATA="onUpdateData"
                 @selectDATA="onSelectData"
                 ></my-table-button>  
             <my-table :tabledata="tablemateData"></my-table>
-            <my-pagination :paginationconfig="tablemateData" @get-show-data="eachPageShowMany"></my-pagination>
+            <my-pagination class="table_page" :paginationconfig="tablemateData" @get-show-data="eachPageShowMany" v-if="tablemateData.config.hasPagination"></my-pagination>
         </div>`,
         data() {
             return {
                 tablemateData: this.tablematedata,
+                urlAddress: this.urladdress,
+                deleteItemArr: this.deleteItems,
                 eventUpData: null,
                 ishaveWaiting:false
             }
         },
-        components: {
-            // 'my-table-button':'my-table-button',
-            // 'my-table':'my-table',
-            // 'my-pagination':'my-pagination'  
-        },
         created(){
             this.ishaveWaiting = this.tablemateData.config.ishaveWaiting;
-            console.log('是否有等待组件' ,this.tablemateData.config.ishaveWaiting);
+            let reqdata = {};
+            reqdata.showMany = this.tablemateData.paginationconfig.eachPageShowCount;
+            reqdata.pageCode = this.tablemateData.paginationconfig.currentPageCode;
+            this.changePageCount();
+            this.onSelectData(reqdata);
         },
         methods: {
-            // 组件拥有事件 不允许改动
-            eachPageShowMany(showMany) {
-                this.eventUpData = showMany;
-                this.$emit('get-show-data', this.eventUpData);
+            eachPageShowMany: function (selectDATA) {
+                this.tablemateData.paginationconfig.eachPageShowCount = selectDATA.showMany;
+                this.tablemateData.paginationconfig.currentPageCode = selectDATA.pageCode;
+                this.changePageCount();
+                this.onSelectData(selectDATA);
+                console.log('每页显示记录条数：', this.tablemateData.paginationconfig.eachPageShowCount);
             },
+            changePageCount(){
+               let count = Math.ceil(this.tablemateData.paginationconfig.totalCount/this.tablemateData.paginationconfig.eachPageShowCount);
+               this.tablemateData.paginationconfig.totalPageCount = count;
+            },
+            viewNeedData(response){
+                let curpage = this.tablemateData.paginationconfig.currentPageCode;
+                let eachMany = this.tablemateData.paginationconfig.eachPageShowCount;
+                let startpos = ( curpage- 1) * eachMany;
+                this.tablemateData.tbodyData = response.body.tableList.slice(startpos, startpos+eachMany);
+                console.log("视图数据" ,this.tablemateData.tbodyData);
+            },
+            // allSelect() {
+            //     this.tablemateData.tbodyData.forEach(item => {
+            //         item.perCheck = this.allCheck
+            //     });
+            //     this.tableData.tbodyData.forEach(item => item.checked = true);
+            // },
+            // 增加
             onAddData(data) {
-                this.$emit('addData', data);
+                data.newFileName = 'nemname';
+                // 自定义通讯工具函数
+                // 此处仅做示例 具体功能自行封装
+                dataInteraction('/api/search', 'POST', data);
             },
+
+            // 删除
             onDeleteData(data) {
-                this.$emit('deleteData', data);
+                 console.log('<<<<<<<<<<<<<<<<<<<<<<<<<上送报文>>>>>>>>>>>>>>>>>>>>>', data);
+                 this.deleteItemArr = this.deleteItemArr.concat(data.deleteWhichItem);
+                 this.tablemateData.config.isshowWaiting = true;
+                 this.$http.get(this.urlAddress)
+                    .then(
+                    response => {
+                        response.ReturnCode = response.ReturnCode == '000000' ? response.ReturnCode : response.body;
+                        if (response.ReturnCode) {
+                            // console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<接受报文>>>>>>>>>>>>>>>>>>>>>\n', response);
+                            let that = this;
+                            setTimeout(() => {that.tablemateData.config.isshowWaiting = false;},500);
+                            //this.tableData.config.isshowWaiting = false;
+                            response.body.tableList.forEach((item,index) => item.ID = index);// 增加每条记录标识
+                            // 过滤掉已经删除过的数据
+                            this.deleteItemArr.forEach((item,index) => {
+                                 response.body.tableList.forEach((item2,index2) => {
+                                     if(item == item2.ID){
+                                         response.body.tableList.splice(index2,1);
+                                     }
+                                 })
+                            });
+                            this.tablemateData.paginationconfig.totalCount = response.body.tableList.length;
+                            this.changePageCount();
+                            this.viewNeedData(response);
+                        }
+                    },
+                    response => console.log('错误' + response)
+                    )
+                 
+                 
             },
+            // 修改
             onUpdateData(data) {
-                this.$emit('updateData', data);
+                 dataInteraction('/api/search', 'GET', data);
+
             },
+            // 查询
             onSelectData(data) {
-                this.$emit('selectData', data);
-            }
+             // console.log('<<<<<<<<<<<<<<<<<<<<<<<<<上送报文>>>>>>>>>>>>>>>>>>>>>', data);
+                this.tablemateData.config.isshowWaiting = true;
+                this.$http.get(this.urlAddress)
+                    .then(
+                    response => {
+                        response.ReturnCode = response.ReturnCode == '000000' ? response.ReturnCode : response.body;
+                        if (response.ReturnCode) {
+                            // console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<接受报文>>>>>>>>>>>>>>>>>>>>>\n', response);
+                            let that = this;
+                            setTimeout(() => {that.tablemateData.config.isshowWaiting = false;},500);
+                            //this.tableData.config.isshowWaiting = false;
+                            let startpos = (data.pageCode - 1) * data.showMany;
+                            response.body.tableList.forEach((item,index) => item.ID = index);// 增加每条记录标识
+                            this.deleteItemArr.forEach((item,index) => {
+                                 response.body.tableList.forEach((item2,index2) => {
+                                     if(item == item2.ID){
+                                         response.body.tableList.splice(index2,1);
+                                     }
+                                 })
+                            });
+                            this.tablemateData.paginationconfig.totalCount = response.body.tableList.length;
+                            this.changePageCount();
+                            this.viewNeedData(response);
+                        }
+                    },
+                    response => console.log('错误' + response)
+                    )
+                }
 
         }
     };
@@ -56,8 +141,8 @@ export default function () {
         props: ["waiting"],
         template:
         `<div v-if="tabaleData.config.isshowWaiting" class="waiting">
-                 <svg t="1499090750144" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3934" xmlns:xlink="http://www.w3.org/1999/xlink" width="80" height="80"><defs><style type="text/css"></style></defs><path d="M462 89l-10.5 10.5Q441 110 441 139.5t21 50q21 20.5 50 20.5t50-20.5q21-20.5 21-50t-21-50Q541 69 512 69t-50 20M188 207l-10.5 10.5Q167 228 167 256t20.5 48.5Q208 325 236 325t48.5-20.5Q305 284 305 256t-20.5-48.5Q264 187 236 187t-48 20M63 514q0 26 18.5 44t44 18q25.5 0 44-18t18.5-44q0-26-18.5-44.5t-44-18.5q-25.5 0-44 18.5T63 514m127 243l-8 8q-8 8-8 30.5t15.5 38.5q15.5 16 38 16t38.5-16q16-16 16-38.5T266 757q-16-16-38.5-16T190 757m277 156q0 19 14 33t33.5 14q19.5 0 33-14t13.5-33q0-20-13.5-33.5t-33-13.5q-19.5 0-33.5 13.5T467 913m304-108q0 14 10 23.5t24 9.5q14 0 24-9.5t10-23.5q0-14-10-24t-24-10q-14 0-24 10t-10 24m141-292q0 10 7 17t16.5 7q9.5 0 17-7t7.5-17q0-10-7.5-17t-17-7q-9.5 0-16.5 7t-7 17m-72-252q0 7 5 12t12 5q7 0 12-5t5-12q0-7-5-12t-12-5q-7 0-12 5t-5 12z" p-id="3935" fill="#d81e06"></path></svg>
-            </div>`,
+            <img src="../static/loading.svg">
+        </div>`,
         data() {
             return {
                 tabaleData: this.waiting
@@ -70,17 +155,17 @@ export default function () {
         template: `<div>
             <table class="zdy-table">
                 <thead>
-                     <th v-if="tableData.config.ishaveCheckbox" @click.stop="onAllSelect">全选/取消</th>
+                     <th v-if="tableData.config.ishaveCheckbox"><input type="checkbox" ref="allcheck" @click="allSelect" class="all_check"></th>
                      <th v-for="(item,index) in tableData.theadData" :key="index">{{item.theadText}}</th>
                      <th v-if="tableData.config.ishaveHandle">操作</th>
                 </thead>
                 <tbody>
                     <tr v-for="(item1,index1) in tabledata.tbodyData" :key="index1" v-if="isDeletaRow">
-                        <td v-if="tableData.config.ishaveCheckbox"><input type="checkbox" ref="checkbox" :checked="item1.checked" @click.stop="item1.checked= !item1.checked"></td>
+                        <td v-if="tableData.config.ishaveCheckbox"><input type="checkbox" ref="checkbox"  @click.stop="singleSelect(item1)"></td>
                         <td v-for="(item2,index2) in tableData.theadData">{{item1[item2.fieldName]}}</td>
                         <td v-if="tableData.config.ishaveHandle">
-                            <a class="td-button td-button-delete" @click.stop="onTdDeleta">删除</a>
-                            <a class="td-button td-button-examine" @click.stop="onTdExamine">查看</a>
+                            <a class="td-button td-button-delete table_btn" @click.stop="onTdDeleta">删除</a>
+                            <a class="td-button td-button-examine table_btn" @click.stop="onTdExamine">查看</a>
                         </td>         
                     </tr>
                 </tbody>
@@ -91,11 +176,11 @@ export default function () {
                 tableData: this.tabledata,
                 // data:this.tabledata.tbodyData,
                 isDeletaRow: true, // 默认显示该列
-                isAllCheck: false  // 是否全选
             }
         },
         created() {
             this.tableData.tbodyData.forEach(item => item.checked = false);
+            
         },
         methods: {
             onTdDeleta(e) {
@@ -103,19 +188,40 @@ export default function () {
                 target.parentNode.parentNode.remove();
                 //this.isDeletaRow = false;
             },
-            onAllSelect() {
-                this.isAllCheck = !this.isAllCheck;
-                if (this.isAllCheck) {
-                   this.$refs.checkbox.forEach(item => item.checked = true);
-                   this.tableData.tbodyData.forEach(item => item.checked = true);
-                   console.log('已选择数据'  ,this.tableData.tbodyData);
-                } else {
-                   this.$refs.checkbox.forEach(item => item.checked = false);
-                   this.tableData.tbodyData.forEach(item => item.checked = false);
-                   console.log('已取消数据'  ,this.tableData.tbodyData);
+            // 实现全选、反选
+             allSelect() {
+                let random = this.tableData.tbodyData.every(item =>!item.checked);
+                if(random){
+                    this.tableData.tbodyData.forEach(item =>item.checked = true);
+                    this.$refs.checkbox.forEach(item =>item.checked = true);
+                }else{
+                    let random = this.tableData.tbodyData.every(item =>item.checked);
+                    if(random){
+                        this.tableData.tbodyData.forEach(item => item.checked = false);
+                        this.$refs.checkbox.forEach(item =>item.checked = false);
+                    }else{
+                         this.$refs.allcheck.disabled = true;
+                    }
                 }
-                //this.$refs.checkbox.forEach(item => item.checked = true);
             },
+            singleSelect(item1) {
+                    item1.checked= !item1.checked;
+                    this.tabledata.tbodyData.forEach(item2 =>{
+                        if(item2.checked){
+                           //当当前的这个按钮被选之后，正好所有的按钮都处于选择状态时 
+                            let allChecked = this.tableData.tbodyData.every(item => item.checked);
+                            console.log('判断是否全选', allChecked);
+                            if(allChecked){
+                                this.$refs.allcheck.disabled = false;
+                                this.$refs.allcheck.checked = true;
+                            }
+                        }else{
+                            this.$refs.allcheck.disabled = false;
+                            this.$refs.allcheck.checked = false;
+                            console.log('mmmmmmfalse');
+                        }
+                    });
+                },
             onTdExamine() { }
         },
         watch: {
@@ -140,10 +246,10 @@ export default function () {
         props: ['tablebutton'],
         template: `<div v-if="tableButton.config.isfunctionTablle">
                 <ul class="table-button">
-                    <li class="table-button-and" @click.stop="onAnd">新增</li>
-                    <li class="table-button-delete" @click.stop="onDelete">删除</li>
-                    <li class="table-button-modify" @click.stop="onModify">修改</li>
-                    <li class="table-button-examine" @click.stop="onExamine">查看</li>
+                    <li class="table-button-and table_btn" @click.stop="onAnd" v-if="tableButton.config.hasAddBtn">新增</li>
+                    <li class="table-button-delete table_btn" @click.stop="onDelete" v-if="tableButton.config.hasDelBtn">删除</li>
+                    <li class="table-button-modify table_btn" @click.stop="onModify" v-if="tableButton.config.hasUpdBtn">修改</li>
+                    <li class="table-button-examine table_btn" @click.stop="onExamine" v-if="tableButton.config.hasExaBtn">查看</li>
                     <div style="display:none;" ref="dialog"><dialog-box :dialogbox="tableButton"></dialog-box></div>
                 </ul>
            </div>`,
@@ -159,6 +265,7 @@ export default function () {
                 //this.isshowDialog = true;
             },
             onDelete() {
+                document.getElementsByClassName('all_check')[0].checked = false;
                 var a_target = [];//缓存将要批量删除的记录ID
                 this.tableButton.tbodyData.forEach((item, index) => {
                     if (item.checked) {
@@ -239,19 +346,19 @@ export default function () {
                 <div style="float:left;">
                     <ul class="pagination">
                         <li @click.stop="switchFirstPage">首页</li>
-                        <li class="prev" @click.stop="onPrev"></li>
+                        <li class="prev" @click.stop="onPrev"><</li>
                         <li v-for="n in paginationConfig.paginationconfig.totalPageCount" ref="my-li" @click="swicthCurrentPage">
                         {{n}}
                         </li>
-                        <li class="next" @click.stop="onNext"></li>
+                        <li class="next" @click.stop="onNext">></li>
                         <li @click.stop="switchLastPage">尾页</li>
-                        <li class="search-page">跳到第
+                        <!--<li class="search-page">跳到第
                             <input type="text" class="link-which-page" v-model="linkPage" @change="onSearhcPage">页
                             <input  type="button" class="sure-search" placeholder = "确定" value="确定" style="padding:0 1rem;">
-                        </li>
+                        </li>-->
                     </ul>
                 </div>
-                <div style="float:left;margin-left:20%;margin-top:2%">
+                <div style="float:right;"">
                     <form>
                         每页显示记录
                             <select name="" id="" ref="my-select" @change="onEachPageShowMany" v-model="showMany">
@@ -293,6 +400,7 @@ export default function () {
                     this.curPageIndex = 0;
                 }
                 this.myLi[this.curPageIndex].className = 'current-page';
+                this.onEachPageShowMany();
             },
             onNext() {
                 this.myLi.forEach((item) => {
@@ -306,6 +414,7 @@ export default function () {
                     this.curPageIndex = this.myLi.length - 1;
                 }
                 this.myLi[this.curPageIndex].className = 'current-page';
+                this.onEachPageShowMany();
             },
             onSearhcPage() {
                 var that = this;

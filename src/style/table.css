@@ -7,24 +7,33 @@
 /*定义表格基本样式*/
 
 .zdy-table {
-    border-collapse: collapse;
-    padding: 1rem;
+    border-collapse: collapse; 
+    width: 100%; 
+    border: 1px solid #e6e6e6;
+    margin-top: 15px; 
 }
-
-
-/* .zdy-table tr:hover{
-    background-color: #ccc;
-    transition: all .1s;
-  }*/
-
+.zdy-table thead th{
+    background:#f2f2f2;
+    font-weight: normal;
+}
 .zdy-table td,.zdy-table th{
-    line-height: 42px;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    text-align: center;
+    padding: 8px;
+    text-align: left;
 }
-
-
+a.td-button-delete,a.td-button-examine{
+    padding: 2px 8px;
+}
+.zdy-table tbody tr:nth-child(even){
+   background: #f9f9f9; 
+}
+.zdy-table tbody tr:hover{
+    background: #ddd;
+}
+.table_page{
+    height:30px;
+    line-height:30px;
+    margin-top: 10px;
+}
 /**
    * 定义表格按钮样式
    */
@@ -34,82 +43,49 @@
     margin: 0;
 }
 
-.table-button li {
+.table_btn {
     display: inline-block;
-    line-height: 48px;
-    width: 80px;
-    text-align: center;
+    padding: 6px 12px;
     color: #fff;
+    background: #ff5c5c;
+    border: 1px solid #ff5c5c;
+    cursor: pointer;
+    border-radius: 4px;
 }
-
-
-/* 定义单条数据的操作按钮样式*/
-
-.td-button,
-.sure-serch {
-    display: inline-block;
-    line-height: 30px;
-    width: 50px;
-    text-align: center;
+.table_btn:hover{
+    background: #ff5c5c;
+    opacity: 0.7;
     color: #fff;
+    border: 1px solid #ff5c5c;
 }
-
-.td-button-delete,
-.sure-serch {
-    background-color: red;
-}
-
-.td-button-examine {
-    background-color: blue;
-}
-
-
-/*定义功能性表格的按钮样式*/
-
-.table-button-and {
-    background-color: green;
-}
-
-.table-button-delete {
-    background-color: red;
-}
-
-.table-button-modify {
-    background-color: yellow;
-}
-
-.table-button-examine {
-    background-color: blue;
-}
-
 
 /*定义分页器样式*/
 
-.pagination {
+ul.pagination {
     font-size: 0;
+    margin:0;
 }
 
-.pagination li,
-.link-which-page {
+.pagination li{
     display: inline-block;
-    font-size: 1rem;
-    line-height: 2rem;
-    width: 2rem;
+    height: 30px;
+    font-size:12px;
+    padding:0 12px;
     text-align: center;
-    /*color: #fff;*/
+    border:1px solid #e6e6e6;
+    color: #999;
+    margin-right:5px;
+    cursor: pointer;
 }
-
-.current-page {
-    background-color: red;
+.pagination li:hover{
+    background: #f9f9f9; 
+}
+.pagination li.current-page {
+    background-color: #ff5c5c;
     color: #fff;
+    border-color:#ff5c5c;
 }
-
-.pagination li:last-child {
-    padding-left: 4rem;
-    width: 15rem;
-}
-
-.prev:after,
+/*.prev:after,
 .next:after {
     display: table;
     content: '';
@@ -120,13 +96,12 @@
     border-bottom: transparent solid .25rem;
     border-left: transparent solid .5rem;
     border-right: #000 solid .5rem;
-}
+}*/
 
-.next:after {
+/*.next:after {
     border-right: transparent solid .5rem;
     border-left: #000 solid .5rem;
-}
-
+}*/
 
 /*定义新增弹框样式*/
 
