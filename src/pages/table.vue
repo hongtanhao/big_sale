@@ -1,10 +1,11 @@
 <template>
     <div id="table" style="margin:30px;transition:all 2s;">
-        <zdy-table :tablematedata="tableData" :urladdress="url" :deleteItems="deleteItem"></zdy-table>
+        <table :tablematedata="tableData" :urladdress="url" :deleteItems="deleteItem"></table>
     </div>
 </template> 
 <script>
-//import ProductsPreviewTool from '@/components/productsDetailInfo/productsPreviewTool';
+
+import table from '@/components/table/table';
 // import axios from 'axios';
 // import data from '../../zdyComponents/data/data';
 export default {
@@ -35,28 +36,39 @@ export default {
                 // 不允许改变数据结构  只需按需配置字段名即可
                 theadData: [{
                     theadText: '机构编码',
-                    fieldName: 'mechanismCode'
+                    fieldName: 'mechanismCode',
+                    class: 'code_class'
                 }, {
                     theadText: '机构名', // 表头显示的文本节点
-                    fieldName: 'mechanismName' // 接口中对应的字段名 
+                    fieldName: 'mechanismName', // 接口中对应的字段名 
+                    class: 'name_class'
                 }, {
-                    theadText: '任务码',
-                    fieldName: 'taskCode'
+                    theadText: '联系电话',
+                    fieldName: 'contactTel',
+                    class: 'tel_class'
                 }, {
                     theadText: '理财计划',
-                    fieldName: 'taskName'
+                    fieldName: 'taskName',
+                    class: 'task_class'
                 }, {
                     theadText: '任务确保目标（万元）',
-                    fieldName: 'taskSure'
+                    fieldName: 'taskSure',
+                    class: 'sure_class'
                 }, {
                     theadText: '目标额',
-                    fieldName: 'taskTarget'
+                    fieldName: 'taskTarget',
+                    class: 'target_class'
                 }],
                 tbodyData: [],// 异步请求 api.json 中的数据
+                telClass: '.tel_class'
             },
+
             url: '../static/data/home_table.json',
             deleteItem: [] // 记住批量删除操作的标识
         }
+    },
+    components:{
+        table
     }
 };
 </script>

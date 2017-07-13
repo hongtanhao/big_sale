@@ -8,7 +8,7 @@ import 'element-ui/lib/theme-default/index.css';
 import router from './router';
 import VueResource from 'vue-resource'
 import Layout from './components/layout';
-import table from '../zdyComponents/zdy-table';
+// import table from '../zdyComponents/zdy-table';
 import * as uiv from 'uiv';
 import hljs from 'highlight.js';
 import VeeValidate from 'vee-validate';
