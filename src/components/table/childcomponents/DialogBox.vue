@@ -1,7 +1,7 @@
 <template>
     <div class="dialogbox">
         <h3 style="text-align:center;padding:1rem;">新增记录</h3>
-        <div v-for="(item,index) in tableData.theadData">
+        <div v-for="(item,index) in dialogbox.theadData">
             <p>{{item.theadText}}
                 <input type="text" :class="item.fieldName+index" />
             </p>
@@ -19,7 +19,6 @@ export default {
     props: ['dialogbox'],
     data() {
         return {
-            tableData: this.dialogbox,
             // data:this.tabledata.tbodyData,
             isDeletaRow: true // 默认显示该列
         }

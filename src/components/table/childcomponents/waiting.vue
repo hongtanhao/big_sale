@@ -1,13 +1,13 @@
 <template>
-    <div v-if="tabaleData.config.isshowWaiting" class="waiting">
-        <img src="../../../../static/loading.svg">
+    <div v-if="waiting.config.isshowWaiting" class="waiting">
+        <img src="static/loading.svg">
     </div>
 </template>
 <script>
 export default {
+    props:['waiting'],
     data() {
         return {
-            tabaleData: this.waiting
         }
     }
 }

@@ -2,19 +2,19 @@
     <div>
         <table class="zdy-table">
             <thead>
-                <th v-if="tableData.config.ishaveCheckbox">
+                <th v-if="tabledata.config.ishaveCheckbox">
                     <input type="checkbox" ref="allcheck" @click="allSelect" class="all_check">
                 </th>
-                <th v-for="(item,index) in tableData.theadData" :key="index">{{item.theadText}}</th>
-                <th v-if="tableData.config.ishaveHandle">操作</th>
+                <th v-for="(item,index) in tabledata.theadData" :key="index">{{item.theadText}}</th>
+                <th v-if="tabledata.config.ishaveHandle">操作</th>
             </thead>
             <tbody>
                 <tr v-for="(item1,index1) in tabledata.tbodyData" :key="index1" v-if="isDeletaRow">
-                    <td v-if="tableData.config.ishaveCheckbox">
+                    <td v-if="tabledata.config.ishaveCheckbox">
                         <input type="checkbox" ref="checkbox" :checked="item1.checked" @click.stop="singleSelect(item1)">
                     </td>
-                    <td v-for="(item2,index2) in tableData.theadData" :class="item2.class">{{item1[item2.fieldName]}}</td>
-                    <td v-if="tableData.config.ishaveHandle">
+                    <td v-for="(item2,index2) in tabledata.theadData" :class="item2.class">{{item1[item2.fieldName]}}</td>
+                    <td v-if="tabledata.config.ishaveHandle">
                         <a class="td-button td-button-delete table_btn" @click.stop="onTdDeleta">删除</a>
                         <a class="td-button td-button-examine table_btn" @click.stop="onTdExamine">查看</a>
                     </td>
@@ -30,7 +30,6 @@ export default {
 
     data() {
         return {
-            tableData: this.tabledata,
             // data:this.tabledata.tbodyData,
             isDeletaRow: true, // 默认显示该列
         }
